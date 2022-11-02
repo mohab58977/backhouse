@@ -19,11 +19,8 @@ pipeline {
                 } else if (env.BRANCH_NAME == 'stage' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'test') {
                 withCredentials([file(credentialsId: 'cfg', variable: 'cfg')]){
                         sh """
-                        if [-f build]; then
                             export BUILD_NUMBER=\$(cat ../build)
-                        else
-                            export BUILD_NUMBER=0
-                        fi
+                       
                         mv Deployment/deploy.yaml Deployment/deploy
                         cat Deployment/deploy | envsubst > Deployment/deploy.yaml
                         rm -f Deployment/deploy
@@ -34,50 +31,44 @@ pipeline {
 
                 }
             }
-            // post {
-            //     success {
-            //         slackSend (channel: 'jenkins-multibranch', color: '#00FF00', message: "BUILD STAGE SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'[${env.BRANCH_NAME}]")
-
-            //     }
-            //     failure {
-            //         slackSend (channel: 'jenkins-multibranch', color: '#FF0000', message: "BUILD STAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' [${env.BRANCH_NAME}]")
-            //     }
-            // }
-        }
-        // stage('Push BackHouse') {
-        //     steps {
-        //         sh 'docker tag back_house:v1 mohamedalaaelsafy/app:v1'
-        //         sh 'docker push mohamedalaaelsafy/app:v1'
-        //     }
-        
-            // post {
-            //     success {
-            //         slackSend (channel: 'jenkins-multibranch', color: '#00FF00', message: "BUILD STAGE SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' [${env.BRANCH_NAME}]")
-
-            //     }
-            //     failure {
-            //         slackSend (channel: 'jenkins-multibranch', color: '#FF0000', message: "BUILD STAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'[${env.BRANCH_NAME}]")
-            //     }
-            // }
-        // }
-
-        // stage('Deploy BackHouse') {
-        //     steps {
-        //         sh 'kubectl apply -f Deployment/service.yaml --validate=false'
-        //         sh 'kubectl apply -f Deployment/Deploy.yaml --validate=false'
-        //     }
-        
-            // post {
-            //     success {
-            //         slackSend (channel: 'jenkins-multibranch', color: '#00FF00', message: "BUILD STAGE SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' [${env.BRANCH_NAME}]")
-
-            //     }
-            //     failure {
-            //         slackSend (channel: 'jenkins-multibranch', color: '#FF0000', message: "BUILD STAGE FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'[${env.BRANCH_NAME}]")
-            //     }
-            // }
-        // }
-    }
+//         pipeline {
+//     agent { label 'new' }
+//     stages {
+//         stage('build') {
+//             steps {
+//                 script {
+//                     if ( env.BRANCH_NAME == "release" ) {
+//                     withCredentials([usernamePassword(credentialsId: "dockerhub" , usernameVariable: 'USER' , passwordVariable: 'PASS')]){
+//                         sh """
+//                             docker login -u ${USER} -p ${PASS}
+//                             docker build -t xxxxxx/new:${BUILD_NUMBER} .
+//                             docker push fathalla22/new:${BUILD_NUMBER}
+//                             echo ${BUILD_NUMBER} > ../build.txt
+//                            """
+//                     }
+//                     }
+//                 }
+//             }
+//         }
+//         stage('deploy') {
+//             steps {
+//                 script {
+//                     if ( env.BRANCH_NAME == "dev" || env.BRANCH_NAME == "test" || env.BRANCH_NAME == "prod" ) {
+//                       withCredentials([file(credentialsId: "kubernetes" , variable: 'CONFIG' )]){
+//                         sh """
+//                             export BUILD_NUMBER=\$(cat ../build.txt)
+//                             cat Deployment/deploy.yaml | envsubst > Deployment/deploy.tmp
+//                             mv Deployment/deploy.tmp Deployment/deploy.yaml
+//                             rm -f Deployment/deploy.yaml.tmp
+//                             kubectl apply -f Deployment --kubeconfig=${CONFIG}
+//                            """
+//                       }
+//                 }
+//                 }
+//             }
+//         }
+//     }
+// }
 
     post {
         success {
